@@ -5,7 +5,9 @@ import com.bring.api.exceptions.MissingParameterException;
 public class TrackingQuery {
 
     private String queryNumber;
-    
+
+    private String optionalUrl;
+
     public TrackingQuery() {
     }
     
@@ -24,8 +26,21 @@ public class TrackingQuery {
         return this;
     }
 
+    public TrackingQuery withOptionalUrl(String optionalUrl){
+        this.optionalUrl = optionalUrl;
+        return this;
+    }
+
     public String getQueryNumber() {
         return queryNumber;
+    }
+
+    public String getOptionalUrl() {
+        return optionalUrl;
+    }
+
+    public boolean hasOptionalUrl(){
+        return optionalUrl != null && optionalUrl.length() > 0;
     }
 
     public String toQueryString() {

@@ -1,11 +1,10 @@
 package com.bring.api.tracking.request;
 
-import static org.junit.Assert.assertEquals;
-
+import com.bring.api.exceptions.MissingParameterException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bring.api.exceptions.MissingParameterException;
+import static org.junit.Assert.*;
 
 public class TrackingQueryTest {
     TrackingQuery sqb;
@@ -25,5 +24,14 @@ public class TrackingQueryTest {
         sqb.withQueryNumber("123456");
         String str = sqb.toQueryString();
         assertEquals("?q=123456",str);
+    }
+
+    @Test
+    public void should_set_optional_url(){
+        assertNull(sqb.getOptionalUrl());
+        assertFalse(sqb.hasOptionalUrl());
+        sqb.withOptionalUrl("optional");
+        assertEquals("optional", sqb.getOptionalUrl());
+        assertTrue(sqb.hasOptionalUrl());
     }
 }

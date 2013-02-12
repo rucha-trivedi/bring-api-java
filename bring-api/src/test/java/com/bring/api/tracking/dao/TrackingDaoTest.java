@@ -1,25 +1,5 @@
 package com.bring.api.tracking.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.bring.api.BringParser;
 import com.bring.api.connection.BringConnection;
 import com.bring.api.connection.HttpUrlConnectionAdapter;
@@ -29,6 +9,23 @@ import com.bring.api.tracking.request.TrackingQuery;
 import com.bring.api.tracking.response.Consignment;
 import com.bring.api.tracking.response.Signature;
 import com.bring.api.tracking.response.TrackingResult;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class TrackingDaoTest {
     private BringConnection bringConnectionMock;
@@ -57,7 +54,7 @@ public class TrackingDaoTest {
         
         dao = new TrackingDao(bringConnectionMock, bringParserMock);
     }
-    
+
     @Test
     public void shouldNotSetLoginHeadersOnNormalFind() throws RequestFailedException, UnmarshalException {
         dao.query(new TrackingQuery("123456"));
@@ -93,5 +90,51 @@ public class TrackingDaoTest {
 //      Mockito.doThrow(new RequestFailedException()).when(bringConnectionMock).openInputStream(signatureUrl.toString());
         when(signatureMock.getLinkToImage()).thenReturn(signatureUrl.toString());
         InputStream signatureStream = trackingDao.getSignatureImageAsStream(signatureMock);
+    }
+
+    @Test
+    public void should_use_standard_url_mybring() throws RequestFailedException, IOException {
+        Map<String,String> headers = new HashMap<String,String>();
+        headers.put("X-MyBring-API-Uid", "username");
+        headers.put("X-MyBring-API-Key", "apiKey");
+
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        dao.query(new TrackingQuery("123456"), "username", "apiKey");
+
+        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
+        verify(bringConnectionMock2).openInputStream("https://www.mybring.com/tracking/api/tracking.xml?q=123456",
+               headers);
+    }
+
+    @Test
+    public void should_use_optional_url_mybring() throws RequestFailedException, IOException {
+        Map<String,String> headers = new HashMap<String,String>();
+        headers.put("X-MyBring-API-Uid", "username");
+        headers.put("X-MyBring-API-Key", "apiKey");
+
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        dao.query(new TrackingQuery("123456").withOptionalUrl("http://optional"), "username", "apiKey");
+
+        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
+        verify(bringConnectionMock2).openInputStream("http://optional?q=123456",
+               headers);
+    }
+
+    @Test
+    public void should_use_standard_url() throws RequestFailedException, IOException {
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        dao.query(new TrackingQuery("123456"));
+
+        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
+        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/tracking.xml?q=123456");
+    }
+
+    @Test
+    public void should_use_optional_url() throws RequestFailedException, IOException {
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        dao.query(new TrackingQuery("123456").withOptionalUrl("http://optional"));
+
+        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
+        verify(bringConnectionMock2).openInputStream("http://optional?q=123456");
     }
 }

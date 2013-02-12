@@ -29,14 +29,24 @@ public class TrackingDao {
     }
 
     public TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
-        return query("http://sporing.bring.no/api/tracking.xml", trackingQuery, null);
+        String baseUrl = "http://sporing.bring.no/api/tracking.xml";
+        if(trackingQuery.hasOptionalUrl()){
+            baseUrl = trackingQuery.getOptionalUrl();
+        }
+
+        return query(baseUrl, trackingQuery, null);
     }
 
     public TrackingResult query(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
         Map<String,String> headers = new HashMap<String,String>();
         headers.put("X-MyBring-API-Uid", apiUserId);
         headers.put("X-MyBring-API-Key", apiKey);
-        return query("https://www.mybring.com/tracking/api/tracking.xml", trackingQuery, headers);
+
+        String baseUrl = "https://www.mybring.com/tracking/api/tracking.xml";
+        if(trackingQuery.hasOptionalUrl()){
+            baseUrl = trackingQuery.getOptionalUrl();
+        }
+        return query(baseUrl, trackingQuery, headers);
     }
     
     private TrackingResult query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
