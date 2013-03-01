@@ -1,10 +1,6 @@
 package com.bring.api.tracking.response;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -20,6 +16,7 @@ import javax.xml.bind.annotation.XmlType;
     "volume",
     "pickupCode",
     "lastRetrievalDate",
+    "deliveryDate",
     "estimatedDeliveryDate",
     "senderName",
     "recipientName",
@@ -51,6 +48,8 @@ public class Package {
     protected String pickupCode;
     @XmlElement(name = "LastRetrievalDate", required = true)
     protected String lastRetrievalDate;
+    @XmlElement(name = "DeliveryDate", required = true)
+    protected String deliveryDate;
     @XmlElement(name = "EstimatedDeliveryDate", required = true)
     protected String estimatedDeliveryDate;
     @XmlElement(name = "SenderName", required = true)
@@ -212,5 +211,13 @@ public class Package {
 
     public void setRecipientAddress(Address recipientAddress) {
         this.recipientAddress = recipientAddress;
+    }
+
+    public String getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(String deliveryDate) {
+        this.deliveryDate = deliveryDate;
     }
 }

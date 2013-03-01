@@ -51,6 +51,8 @@
       <xs:element name="Volume" type="VolumeType"/>
       <xs:element name="PickupCode" type="xs:string"/>
       <xs:element name="LastRetrievalDate" type="xs:string"/>
+      <xs:element name="EstimatedDeliveryDate" type="xs:string"/>
+      <xs:element name="DeliveryDate" type="xs:string"/>
       <xs:element name="SenderName" type="xs:string" minOccurs="0"/>
       <xs:element name="RecipientName" type="xs:string" minOccurs="0"/>
       <xs:element name="RecipientAddress" type="AddressType" minOccurs="0"/>
