@@ -1,21 +1,20 @@
 package com.bring.api.shippingguide.dao;
 
-import static java.lang.Double.parseDouble;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import com.bring.api.BringService;
+import com.bring.api.connection.HttpUrlConnectionAdapter;
+import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.shippingguide.request.Package;
 import com.bring.api.shippingguide.request.ProductType;
 import com.bring.api.shippingguide.request.QueryType;
 import com.bring.api.shippingguide.request.Shipment;
-import com.bring.api.shippingguide.response.ShippingGuideResult;
 import com.bring.api.shippingguide.response.Price;
+import com.bring.api.shippingguide.response.ShippingGuideResult;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bring.api.connection.HttpUrlConnectionAdapter;
-import com.bring.api.exceptions.RequestFailedException;
+import static java.lang.Double.parseDouble;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ShippingGuideDaoIntegrationTest {
 
@@ -106,7 +105,7 @@ public class ShippingGuideDaoIntegrationTest {
         try {
             dao.query(shipment, QueryType.PRICE);
         } catch (RequestFailedException e) {
-            assertTrue(e.getMessage().startsWith("FG_INPUT_025"));
+            assertTrue(e.getMessage().contains("FG_INPUT_025"));
         }
         
     }
