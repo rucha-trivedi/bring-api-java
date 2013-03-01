@@ -1,15 +1,14 @@
 package com.bring.api.connection;
 
-import static org.junit.Assert.assertTrue;
+import com.bring.api.exceptions.RequestFailedException;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.bring.api.exceptions.RequestFailedException;
+import static org.junit.Assert.assertTrue;
 
 public class HttpClient3AdapterIntegrationTest {
     @Before
@@ -55,7 +54,7 @@ public class HttpClient3AdapterIntegrationTest {
             HttpClient3Adapter httpClient = new HttpClient3Adapter("test");
             httpClient.openInputStream(url);
         } catch (RequestFailedException e) {
-            assertTrue(e.getMessage().startsWith("FG_INPUT_025"));
+            assertTrue(e.getMessage().contains("FG_INPUT_025"));
         }
     }
 }
