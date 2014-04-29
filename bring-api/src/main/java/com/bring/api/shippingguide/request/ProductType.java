@@ -1,7 +1,5 @@
 package com.bring.api.shippingguide.request;
 
-import java.util.Map;
-
 /**
  * The products it is possible to query for.
  * Please note that fraktguiden might support additional products, please check fraktguide.bring.no.
@@ -38,6 +36,7 @@ public enum ProductType {
     COURIER_BICYCLE_2H("COURIER_BICYCLE_2H"),
     COURIER_BICYCLE_4H("COURIER_BICYCLE_4H"),
     COURIER_BICYCLE_6H("COURIER_BICYCLE_6H"),
+    NORGESPAKKE("NORGESPAKKE"),
     ALL("");
 
     private final String queryName;
