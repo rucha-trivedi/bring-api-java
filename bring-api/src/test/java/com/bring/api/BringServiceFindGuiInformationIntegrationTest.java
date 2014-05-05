@@ -1,11 +1,6 @@
 package com.bring.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Map;
-
+import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.shippingguide.request.Package;
 import com.bring.api.shippingguide.request.ProductType;
 import com.bring.api.shippingguide.request.QueryType;
@@ -15,7 +10,11 @@ import com.bring.api.shippingguide.response.Product;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bring.api.exceptions.RequestFailedException;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BringServiceFindGuiInformationIntegrationTest {
     Shipment shipment;
@@ -54,11 +53,14 @@ public class BringServiceFindGuiInformationIntegrationTest {
     public void shouldReturnGuiInformationObjectsOnSearch() throws RequestFailedException {
         shipment.addProduct(ProductType.SERVICEPAKKE);
         shipment.addProduct(ProductType.B_POST);
+        shipment.addProduct(ProductType.NORGESPAKKE);
         Map<ProductType,Product> map = service.queryShippingGuide(shipment, QueryType.ALL).getProducts();
         assertTrue(map.containsKey(ProductType.SERVICEPAKKE));
         assertTrue(map.containsKey(ProductType.B_POST));
+        assertTrue(map.containsKey(ProductType.NORGESPAKKE));
         assertEquals(GuiInformation.class,map.get(ProductType.SERVICEPAKKE).getGuiInformation().getClass());
         assertEquals(GuiInformation.class,map.get(ProductType.B_POST).getGuiInformation().getClass());
+        assertEquals(GuiInformation.class,map.get(ProductType.NORGESPAKKE).getGuiInformation().getClass());
 
     }
     
