@@ -9,7 +9,7 @@ This repository contains an open source client library for:
 - [Bring Tracking](http://developer.bring.com/learn/tracking/apireference.html)
 - [Bring Shipment Guide](http://developer.bring.com/learn/shipping-guide/documentation/apireference.html)
 
-[Javadoc is also available.](http://bring.github.com/bring-api-java/1.0.0/)
+[Javadoc is also available.](http://bring.github.com/bring-api-java/1.0.6/)
 
 License
 -------
