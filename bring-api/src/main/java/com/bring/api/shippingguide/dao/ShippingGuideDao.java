@@ -1,8 +1,5 @@
 package com.bring.api.shippingguide.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.bring.api.BringParser;
 import com.bring.api.connection.BringConnection;
 import com.bring.api.exceptions.RequestFailedException;
@@ -10,6 +7,9 @@ import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.shippingguide.request.QueryType;
 import com.bring.api.shippingguide.request.Shipment;
 import com.bring.api.shippingguide.response.ShippingGuideResult;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ShippingGuideDao {
 
@@ -27,7 +27,8 @@ public class ShippingGuideDao {
     }
 
     public ShippingGuideResult query(Shipment shipment, QueryType queryType) throws RequestFailedException {
-        String url = "http://fraktguide.bring.no/fraktguide/products/" + queryType.getName() + ".xml" + shipment.toQueryString();
+
+        String url = getBaseUrl(shipment) + queryType.getName() + ".xml" + shipment.toQueryString();
         InputStream inputStream = null;
         try {
             inputStream = bringConnection.openInputStream(url);
@@ -46,5 +47,13 @@ public class ShippingGuideDao {
                 }
             }
         }
+    }
+
+    private String getBaseUrl(Shipment shipment) {
+        if(shipment.hasOverriddenUrl()) {
+            return shipment.getOverriddenUrl();
+        }
+
+        return "http://fraktguide.bring.no/fraktguide/products/";
     }
 }

@@ -33,6 +33,7 @@ public class Shipment {
     private Map<ProductType, PriceAdjustment> priceAdjustments;
     private List<Package> packages;
     private DateTimeFormatter dateFormatter;
+    private String overriddenUrl;
 
 
     public Shipment() {
@@ -207,6 +208,28 @@ public class Shipment {
         this.toCity = toCity;
         return this;
     }
+
+    /**
+     * If you need to mock out the shipping guide service, you can set another url
+     * to query for here.
+     *
+     * @param overriddenUrl
+     * @return
+     */
+    public Shipment withOverriddenUrl(String overriddenUrl) {
+        this.overriddenUrl = overriddenUrl;
+        return this;
+    }
+
+    public boolean hasOverriddenUrl() {
+        return this.overriddenUrl != null;
+    }
+
+    public String getOverriddenUrl() {
+        return this.overriddenUrl;
+    }
+
+
     /**
      * Creates query string that is sent to fraktguiden.bring.no
      */
@@ -282,4 +305,6 @@ public class Shipment {
             throw new ExceededNumberOfPackagesException();            
         }
     }
+
+
 }
