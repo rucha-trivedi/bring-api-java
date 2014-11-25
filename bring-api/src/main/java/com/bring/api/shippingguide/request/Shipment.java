@@ -300,6 +300,58 @@ public class Shipment {
         return str;
     }
 
+    public String getFromPostalCode() {
+        return fromPostalCode;
+    }
+
+    public String getToPostalCode() {
+        return toPostalCode;
+    }
+
+    public String getToCity() {
+        return toCity;
+    }
+
+    public String getFromCountry() {
+        return fromCountry;
+    }
+
+    public String getToCountry() {
+        return toCountry;
+    }
+
+    public DateTime getShippingDateTime() {
+        return shippingDateTime;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public boolean isEdi() {
+        return edi;
+    }
+
+    public boolean isPostingAtPostOffice() {
+        return postingAtPostOffice;
+    }
+
+    public Set<ProductType> getProducts() {
+        return products;
+    }
+
+    public Set<AdditionalService> getAdditionalServices() {
+        return additionalServices;
+    }
+
+    public Map<ProductType, PriceAdjustment> getPriceAdjustments() {
+        return priceAdjustments;
+    }
+
+    public List<Package> getPackages() {
+        return packages;
+    }
+
     private void failOnToManyPackages(List<Package> list) {
         if(list.size() > MAX_NUMBER_OF_PACKAGES) {
             throw new ExceededNumberOfPackagesException();            
