@@ -14,6 +14,7 @@ public class Package {
     private String height;
     private String volume;
     private String weightInGrams;
+    private boolean volumeSpecial = false;
 
     /**
      * @return Package length in cm
@@ -93,8 +94,24 @@ public class Package {
         return this;
     }
 
+    public boolean isVolumeSpecial() {
+        return volumeSpecial;
+    }
+
     /**
-     * @param suffix Used to append suffix to weightInGrams and volume (e.g. volume4=..)
+     * Flag to indicate if the package has a shape that may require 'special handling fee'.
+     * False by default.
+     *
+     * @param volumeSpecial
+     * @return
+     */
+    public Package withVolumeSpecial(boolean volumeSpecial) {
+        this.volumeSpecial = volumeSpecial;
+        return this;
+    }
+
+    /**
+     * @param suffix Used to append suffix to weightInGrams, volume and volumeSpecial (e.g. volume4=..)
      * @return String to be used in HTTP GET request
      */
     public String toQueryString(String suffix){
@@ -106,6 +123,10 @@ public class Package {
        
         if (volume != null) {
             str += "&volume" + suffix + "=" + volume;
+        }
+
+        if (volumeSpecial) {
+            str += "&volumeSpecial" + suffix + "=" +  volumeSpecial;
         }
         
         // Validate length, width and height
