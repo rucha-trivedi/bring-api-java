@@ -136,4 +136,33 @@ public class ShippingGuideDaoIntegrationTest {
         ShippingGuideResult shippingGuideResult = bringService.queryShippingGuide(shipment, QueryType.EXPECTED_DELIVERY);
         String expectedDeliveryDate = shippingGuideResult.getProduct(ProductType.SERVICEPAKKE).getExpectedDelivery().getWorkingDays();
     }
+
+    @Test
+    public void should_return_a_higher_price_when_volume_special_is_true_than_when_it_is_not() throws RequestFailedException {
+        shipment = presetShipmentWithVolumeSpecialSetTo(true);
+        ShippingGuideResult resultWithVolumeSpecial = dao.query(this.shipment, QueryType.PRICE);
+        String priceWithVolumeSpecial = resultWithVolumeSpecial.getProducts().get(ProductType.NORGESPAKKE).getPrice()
+                .getPackagePriceWithoutAdditionalServices().getAmountWithoutVAT();
+
+        Shipment secondShipment = presetShipmentWithVolumeSpecialSetTo(false);
+        ShippingGuideResult resultWithoutVolumeSpecial = dao.query(secondShipment, QueryType.PRICE);
+        String priceWithoutVolumeSpecial = resultWithoutVolumeSpecial.getProducts().get(ProductType.NORGESPAKKE).getPrice()
+                .getPackagePriceWithoutAdditionalServices().getAmountWithoutVAT();
+
+        assertTrue(parseDouble(priceWithVolumeSpecial) > parseDouble(priceWithoutVolumeSpecial));
+    }
+
+    private Shipment presetShipmentWithVolumeSpecialSetTo(boolean volumeSpecial) {
+        shipment = new Shipment();
+        shipment.withFromPostalCode("1068");
+        shipment.withToPostalCode("0484");
+
+        Package withVolumeSpecial = new Package();
+        withVolumeSpecial.withWeightInGrams("1000");
+        withVolumeSpecial.withVolumeSpecial(volumeSpecial);
+        shipment.addPackage(withVolumeSpecial);
+        shipment.addProduct(ProductType.NORGESPAKKE);
+
+        return shipment;
+    }
 }
