@@ -21,7 +21,6 @@
           <Event>
             <Description>Sendingen er ankommet terminal og blir videresendt</Description>
             <Status>IN_TRANSIT</Status>
-            <LmEventCode>G</LmEventCode>
             <RecipientSignature>
               <Name/>
             </RecipientSignature>
@@ -37,7 +36,6 @@
           </Event>
           <Event>
             <Description>Sendingen er innlevert til terminal og videresendt</Description>
-            <LmEventCode>G</LmEventCode>
             <Status>IN_TRANSIT</Status>
             <RecipientSignature>
               <Name/>
@@ -54,7 +52,6 @@
           </Event>
           <Event>
             <Description>Sendingen er innlevert på postkontor</Description>
-            <LmEventCode>R</LmEventCode>
             <Status>HANDED_IN</Status>
             <RecipientSignature>
               <Name/>

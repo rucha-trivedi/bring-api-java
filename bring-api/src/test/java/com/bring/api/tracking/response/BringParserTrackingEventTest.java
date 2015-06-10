@@ -46,14 +46,8 @@ public class BringParserTrackingEventTest {
     public void shouldParseEventStatusFromEnpakkeXml(){
     	String status = eventSet.getEvents().get(0).getStatus();
     	assertEquals("IN_TRANSIT", status);
-    }
-
-    @Test
-    public void shouldParseEventLmEventCodeFromEnpakkeXml(){
-        String lmEventCode = eventSet.getEvents().get(0).getLmEventCode();
-        assertEquals("G", lmEventCode);
-    }
-
+    } 
+    
     @Test
     public void shouldParseEventRecipientSignatureFromEnpakkeXml(){
     	Signature rs = eventSet.getEvents().get(0).getSignature();
