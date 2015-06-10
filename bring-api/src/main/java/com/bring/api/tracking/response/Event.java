@@ -10,7 +10,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "EventType", propOrder = {
     "description",
     "status",
-        "signature",
+    "lmEventCode",
+    "signature",
     "unitId",
     "postalCode",
     "city",
@@ -27,6 +28,8 @@ public class Event {
     protected String description;
     @XmlElement(name = "Status", required = true)
     protected String status;
+    @XmlElement(name = "LmEventCode")
+    protected String lmEventCode;
     @XmlElement(name = "RecipientSignature", required = true)
     protected Signature signature;
     @XmlElement(name = "UnitId", required = true)
@@ -143,4 +146,7 @@ public class Event {
         this.consignmentEvent = value;
     }
 
+    public String getLmEventCode() { return lmEventCode; }
+
+    public void setLmEventCode(String value) { this.lmEventCode = value; }
 }
