@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.*;
     "senderName",
     "recipientName",
     "recipientAddress",
+    "recipientHandlingAddress",
     "eventSet",
     "additionalServicesSet"
 })
@@ -58,6 +59,8 @@ public class Package {
     protected String recipientName;
     @XmlElement(name = "RecipientAddress", required = true)
     protected Address recipientAddress;
+    @XmlElement(name = "RecipientHandlingAddress")
+    protected Address recipientHandlingAddress;
     @XmlElement(name = "EventSet")
     protected EventSet eventSet;
     @XmlElement(name = "AdditionalServicesSet")
@@ -197,8 +200,7 @@ public class Package {
         this.senderName = senderName;
     }
 
-    public String getRecipientName() {
-        return recipientName;
+    public String getRecipientName() { return recipientName;
     }
 
     public void setRecipientName(String recipientName) {
@@ -209,9 +211,11 @@ public class Package {
         return recipientAddress;
     }
 
-    public void setRecipientAddress(Address recipientAddress) {
-        this.recipientAddress = recipientAddress;
-    }
+    public void setRecipientAddress(Address recipientAddress) { this.recipientAddress = recipientAddress; }
+
+    public Address getRecipientHandlingAddress() { return recipientHandlingAddress; }
+
+    public void setRecipientHandlingAddress(Address recipientHandlingAddress) { this.recipientHandlingAddress = recipientHandlingAddress; }
 
     public String getDeliveryDate() {
         return deliveryDate;
