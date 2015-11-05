@@ -56,6 +56,7 @@
       <xs:element name="SenderName" type="xs:string" minOccurs="0"/>
       <xs:element name="RecipientName" type="xs:string" minOccurs="0"/>
       <xs:element name="RecipientAddress" type="AddressType" minOccurs="0"/>
+      <xs:element name="RecipientHandlingAddress" type="AddressType" minOccurs="0"/>
       <xs:element name="EventSet" type="EventSetType" minOccurs="0"/>
       <xs:element name="AdditionalServicesSet" type="AdditionalServicesSetType" minOccurs="0"/>
 	</xs:sequence>
