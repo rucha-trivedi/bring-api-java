@@ -200,8 +200,7 @@ public class Package {
         this.senderName = senderName;
     }
 
-    public String getRecipientName() { return recipientName;
-    }
+    public String getRecipientName() { return recipientName; }
 
     public void setRecipientName(String recipientName) {
         this.recipientName = recipientName;
