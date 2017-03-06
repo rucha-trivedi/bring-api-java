@@ -79,7 +79,6 @@ public class TrackingDao {
                 inputStream = bringConnection.openInputStream(url, headers);
             }
             TrackingResponse trackingResult = getTrackingResponse(trackingQuery, inputStream, baseUrl);
-            //convertSignatureUrlsToFullUrl(trackingResult, baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1));
             return trackingResult;
         }
         catch (UnmarshalException e) {
