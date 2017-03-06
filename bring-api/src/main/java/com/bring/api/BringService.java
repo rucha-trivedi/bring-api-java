@@ -10,8 +10,10 @@ import com.bring.api.shippingguide.request.Shipment;
 import com.bring.api.shippingguide.response.ShippingGuideResult;
 import com.bring.api.tracking.dao.TrackingDao;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.Signature;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.v1.Signature;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import com.bring.api.tracking.response.v2.TrackingResultV2;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -76,7 +78,18 @@ public class BringService {
     public TrackingResult queryTracking(TrackingQuery trackingQuery) throws RequestFailedException {
         return trackingDao.query(trackingQuery);
     }
-    
+
+    /**
+     * Queries Bring Tracking for passed in query, with different versions of response.
+     *
+     * @param trackingQuery Search parameters (reference-, transmission-, or package number)
+     * @return TrackingResponse Tracking data
+     * @throws RequestFailedException
+     */
+    public TrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
+        return trackingDao.queryWithVersion(trackingQuery);
+    }
+
     /**
      * Queries Bring Tracking for passed in query using given API userID and key.
      * Returns more info than open (non-logged in) query.

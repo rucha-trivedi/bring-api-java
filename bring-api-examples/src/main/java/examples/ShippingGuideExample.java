@@ -34,6 +34,6 @@ public class ShippingGuideExample {
             .getAmountWithVAT();
 
         // Display result
-        System.out.println("Price: "+amountWithVAT);
+        System.out.println("Price: " + amountWithVAT);
     }
 }

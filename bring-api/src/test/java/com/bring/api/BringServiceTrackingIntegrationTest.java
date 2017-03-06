@@ -2,9 +2,17 @@ package com.bring.api;
 
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.request.Version;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import com.bring.api.tracking.response.v2.TrackingResultV2;
+import no.bring.sporing._2.ConsigmentElementType;
+import no.bring.sporing._2.EventType;
+import no.bring.sporing._2.PackageCargoConsignmentType;
+import no.bring.sporing._2.PackageCargoEventType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +36,22 @@ public class BringServiceTrackingIntegrationTest {
     public void shouldBeAbleToFindLatestStatus() throws RequestFailedException {
         TrackingQuery query = new TrackingQuery("TESTPACKAGEDELIVERED");
         String result = service.queryTracking(query).getConsignment(0).getPackage(0).getEvent(0).getDescription();
-        assertEquals("Sendingen er utlevert", result);
+        assertEquals("Sendingen er utlevert.", result);
+    }
+
+    @Test(expected = RequestFailedException.class)
+    public void shouldBeAbleToFindThrowBadRequestForOldMethodUsed() throws RequestFailedException {
+        TrackingQuery query = new TrackingQuery("TESTPACKAGEDELIVERED");
+        query.withOptionalVersion(Version.v2);
+        service.queryTracking(query).getConsignment(0).getPackage(0).getEvent(0).getDescription();
+    }
+
+    @Test
+    public void shouldBeAbleToFindLatestStatusForVersion() throws RequestFailedException {
+        TrackingQuery query = new TrackingQuery("TESTPACKAGEDELIVERED");
+        query.withOptionalVersion(Version.v2);
+        List<ConsigmentElementType> consignment = ((TrackingResultV2) service.queryTrackingWithVersion(query)).getConsignmentSet().getConsignment();
+        EventType eventType = ((PackageCargoConsignmentType) consignment.get(0)).getPackageSet().getPackage().get(0).getEventSet().getEvent().get(0);
+        assertEquals("Sendingen er utlevert.", ((PackageCargoEventType) eventType).getDescription());
     }
 }

@@ -6,9 +6,10 @@ import com.bring.api.connection.HttpUrlConnectionAdapter;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.Consignment;
-import com.bring.api.tracking.response.Signature;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.request.Version;
+import com.bring.api.tracking.response.v1.Consignment;
+import com.bring.api.tracking.response.v1.Signature;
+import com.bring.api.tracking.response.v1.TrackingResult;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -102,7 +103,7 @@ public class TrackingDaoTest {
         dao.query(new TrackingQuery("123456"), "username", "apiKey");
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
-        verify(bringConnectionMock2).openInputStream("https://www.mybring.com/tracking/api/tracking.xml?q=123456",
+        verify(bringConnectionMock2).openInputStream("https://www.mybring.com/tracking/api/v1/tracking.xml?q=123456",
                headers);
     }
 
@@ -126,7 +127,18 @@ public class TrackingDaoTest {
         dao.query(new TrackingQuery("123456"));
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
-        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/tracking.xml?q=123456");
+        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v1/tracking.xml?q=123456");
+    }
+
+    @Test
+    public void should_use_standard_url_for_versions() throws RequestFailedException, IOException {
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        TrackingQuery trackingQuery = new TrackingQuery("123456");
+        trackingQuery.withOptionalVersion(Version.v2);
+        dao.query(trackingQuery);
+
+        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
+        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v2/tracking.xml?q=123456");
     }
 
     @Test

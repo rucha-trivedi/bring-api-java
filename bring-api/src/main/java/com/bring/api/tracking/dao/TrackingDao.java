@@ -5,8 +5,15 @@ import com.bring.api.connection.BringConnection;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.*;
-import com.bring.api.tracking.response.Package;
+import com.bring.api.tracking.request.Version;
+import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.v1.Consignment;
+import com.bring.api.tracking.response.v1.Event;
+import com.bring.api.tracking.response.v1.Package;
+import com.bring.api.tracking.response.v1.Signature;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import com.bring.api.tracking.response.v2.TrackingResultV2;
+import no.bring.sporing._2.ConsignmentSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,21 +22,33 @@ import java.util.Map;
 
 public class TrackingDao {
 
+    final String OPEN_TRACKING_BASE_URL = "http://sporing.bring.no/api/{version}/tracking.xml";
+    final String LOGGED_IN_TRACKING_BASE_URL = "https://www.mybring.com/tracking/api/{version}/tracking.xml";
+
     private BringConnection bringConnection;
-    private BringParser<TrackingResult> bringParser;
+    private BringParser<TrackingResult> bringParserV1;
+    private BringParser<ConsignmentSet> bringParserV2;
 
     public TrackingDao(BringConnection connection){
-        bringParser = new BringParser<TrackingResult>(TrackingResult.class);
+        bringParserV1 = new BringParser<TrackingResult>(TrackingResult.class);
+        bringParserV2 = new BringParser<ConsignmentSet>(ConsignmentSet.class);
         this.bringConnection = connection;
     }
 
-    public TrackingDao(BringConnection bringConnection, BringParser<TrackingResult> bringParser) {
+    public TrackingDao(BringConnection bringConnection, BringParser<TrackingResult> bringParserV1) {
         this.bringConnection = bringConnection;
-        this.bringParser = bringParser;
+        this.bringParserV1 = bringParserV1;
     }
 
     public TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
-        String baseUrl = "http://sporing.bring.no/api/tracking.xml";
+        if(trackingQuery.getVersion() != Version.v1) {
+            throw new RequestFailedException("Version not supported", 400);
+        }
+        return (TrackingResult) queryWithVersion(trackingQuery);
+    }
+
+    public TrackingResponse queryWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
+        String baseUrl = getOpenTrackingBaseUrl(trackingQuery);
         if(trackingQuery.hasOptionalUrl()){
             baseUrl = trackingQuery.getOptionalUrl();
         }
@@ -42,14 +61,14 @@ public class TrackingDao {
         headers.put("X-MyBring-API-Uid", apiUserId);
         headers.put("X-MyBring-API-Key", apiKey);
 
-        String baseUrl = "https://www.mybring.com/tracking/api/tracking.xml";
+        String baseUrl = getLoggedInTrackingBaseUrl(trackingQuery);
         if(trackingQuery.hasOptionalUrl()){
             baseUrl = trackingQuery.getOptionalUrl();
         }
-        return query(baseUrl, trackingQuery, headers);
+        return (TrackingResult) query(baseUrl, trackingQuery, headers);
     }
     
-    private TrackingResult query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
+    private TrackingResponse query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
         String url = baseUrl + trackingQuery.toQueryString();
         InputStream inputStream = null;
         try {
@@ -59,8 +78,8 @@ public class TrackingDao {
             else {
                 inputStream = bringConnection.openInputStream(url, headers);
             }
-            TrackingResult trackingResult = bringParser.unmarshal(inputStream);
-            convertSignatureUrlsToFullUrl(trackingResult, baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1));
+            TrackingResponse trackingResult = getTrackingResponse(trackingQuery, inputStream, baseUrl);
+            //convertSignatureUrlsToFullUrl(trackingResult, baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1));
             return trackingResult;
         }
         catch (UnmarshalException e) {
@@ -78,7 +97,31 @@ public class TrackingDao {
         }
     }
 
-    private void convertSignatureUrlsToFullUrl(TrackingResult trackingResult, String urlPrefix) {
+    private TrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException {
+        switch (trackingQuery.getVersion()) {
+            case v1 :
+                return getV1Response(inputStream, baseUrl);
+            case v2 :
+                return getV2Response(inputStream);
+            default :
+                throw new RuntimeException("no supported tracking request version.");
+        }
+    }
+
+    private TrackingResponse getV1Response(InputStream inputStream, String baseUrl) throws UnmarshalException {
+        TrackingResult trackingResult = bringParserV1.unmarshal(inputStream);
+        convertSignatureUrlsToFullUrl(trackingResult, baseUrl);
+        return trackingResult;
+    }
+
+    private TrackingResponse getV2Response(InputStream inputStream) throws UnmarshalException {
+        ConsignmentSet consignmentSetType = bringParserV2.unmarshal(inputStream);
+        return new TrackingResultV2(consignmentSetType);
+    }
+
+    private void convertSignatureUrlsToFullUrl(TrackingResult trackingResult, String baseUrl) {
+        String urlPrefix = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+
         for (Consignment consignment : trackingResult.getConsignments()) {
             if (consignment.getPackageSet() != null && consignment.getPackageSet().getPackages() != null) {
                 for (Package packet : consignment.getPackageSet().getPackages()) {
@@ -95,6 +138,14 @@ public class TrackingDao {
         if (url != null && !url.matches("^https?://.*")) {
             event.getSignature().setLinkToImage(urlPrefix + url);
         }
+    }
+
+    private String getOpenTrackingBaseUrl(TrackingQuery trackingQuery) {
+        return OPEN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().name());
+    }
+
+    private String getLoggedInTrackingBaseUrl(TrackingQuery trackingQuery) {
+        return LOGGED_IN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().name());
     }
 
     /**
