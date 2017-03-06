@@ -104,7 +104,7 @@ public class TrackingDao {
             case v2 :
                 return getV2Response(inputStream);
             default :
-                throw new RuntimeException("no supported tracking request version.");
+                throw new RuntimeException("not supported tracking request version.");
         }
     }
 
