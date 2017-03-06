@@ -2,6 +2,9 @@ package com.bring.api.tracking.response;
 
 import com.bring.api.BringParser;
 import com.bring.api.exceptions.UnmarshalException;
+import com.bring.api.tracking.response.v1.AdditionalService;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import com.bring.api.tracking.response.v1.Package;
 import org.junit.Before;
 import org.junit.Test;
 
