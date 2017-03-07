@@ -10,8 +10,7 @@ import com.bring.api.tracking.response.v1.Consignment;
 import com.bring.api.tracking.response.v1.Event;
 import com.bring.api.tracking.response.v1.Package;
 import com.bring.api.tracking.response.v1.Signature;
-import com.bring.api.tracking.response.v1.TrackingResult;
-import com.bring.api.tracking.response.v2.TrackingResultV2;
+import com.bring.api.tracking.response.v2.TrackingResult;
 import no.bring.sporing._2.ConsignmentSet;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class TrackingDao {
     final String LOGGED_IN_TRACKING_BASE_URL = "https://www.mybring.com/tracking/api/{version}/tracking.xml";
 
     private BringConnection bringConnection;
-    private BringParser<TrackingResult> bringParserV1;
+    private BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1;
     private BringParser<ConsignmentSet> bringParserV2;
 
     public TrackingDao(BringConnection connection){
@@ -37,23 +36,23 @@ public class TrackingDao {
         this.bringConnection = connection;
     }
 
-    public TrackingDao(BringConnection bringConnection, BringParser<TrackingResult> bringParserV1) {
+    public TrackingDao(BringConnection bringConnection, BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1) {
         this.bringConnection = bringConnection;
         this.bringParserV1 = bringParserV1;
     }
 
-    public TrackingDao(BringConnection bringConnection, BringParser<TrackingResult> bringParserV1, BringParser<ConsignmentSet> bringParserV2) {
+    public TrackingDao(BringConnection bringConnection, BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1, BringParser<ConsignmentSet> bringParserV2) {
         this.bringConnection = bringConnection;
         this.bringParserV1 = bringParserV1;
         this.bringParserV2 = bringParserV2;
     }
 
     @Deprecated
-    public TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
         if(trackingQuery.getVersion() != v1) {
             throw new RequestFailedException("Version not supported : " + trackingQuery.getVersion(), 400);
         }
-        return (TrackingResult) queryWithVersion(trackingQuery);
+        return (com.bring.api.tracking.response.v1.TrackingResult) queryWithVersion(trackingQuery);
     }
 
     public TrackingResponse queryWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
@@ -65,7 +64,7 @@ public class TrackingDao {
         return query(baseUrl, trackingQuery, null);
     }
 
-    public TrackingResult query(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult query(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
         Map<String,String> headers = new HashMap<String,String>();
         headers.put("X-MyBring-API-Uid", apiUserId);
         headers.put("X-MyBring-API-Key", apiKey);
@@ -74,7 +73,7 @@ public class TrackingDao {
         if(trackingQuery.hasOptionalUrl()){
             baseUrl = trackingQuery.getOptionalUrl();
         }
-        return (TrackingResult) query(baseUrl, trackingQuery, headers);
+        return (com.bring.api.tracking.response.v1.TrackingResult) query(baseUrl, trackingQuery, headers);
     }
     
     private TrackingResponse query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
@@ -117,17 +116,17 @@ public class TrackingDao {
     }
 
     private TrackingResponse getV1Response(InputStream inputStream, String baseUrl) throws UnmarshalException {
-        TrackingResult trackingResult = bringParserV1.unmarshal(inputStream);
+        com.bring.api.tracking.response.v1.TrackingResult trackingResult = bringParserV1.unmarshal(inputStream);
         convertSignatureUrlsToFullUrl(trackingResult, baseUrl);
         return trackingResult;
     }
 
     private TrackingResponse getV2Response(InputStream inputStream) throws UnmarshalException {
         ConsignmentSet consignmentSetType = bringParserV2.unmarshal(inputStream);
-        return new TrackingResultV2(consignmentSetType);
+        return new TrackingResult(consignmentSetType);
     }
 
-    private void convertSignatureUrlsToFullUrl(TrackingResult trackingResult, String baseUrl) {
+    private void convertSignatureUrlsToFullUrl(com.bring.api.tracking.response.v1.TrackingResult trackingResult, String baseUrl) {
         String urlPrefix = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
 
         for (Consignment consignment : trackingResult.getConsignments()) {

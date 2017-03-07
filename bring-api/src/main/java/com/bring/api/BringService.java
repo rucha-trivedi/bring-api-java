@@ -12,8 +12,6 @@ import com.bring.api.tracking.dao.TrackingDao;
 import com.bring.api.tracking.request.TrackingQuery;
 import com.bring.api.tracking.response.TrackingResponse;
 import com.bring.api.tracking.response.v1.Signature;
-import com.bring.api.tracking.response.v1.TrackingResult;
-import com.bring.api.tracking.response.v2.TrackingResultV2;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -52,7 +50,7 @@ public class BringService {
      *
      * @param bringConnection Custom BringConnection
      */
-    public BringService(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<TrackingResult> trackingParser) {
+    public BringService(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<com.bring.api.tracking.response.v1.TrackingResult> trackingParser) {
         initDaos(bringConnection, shippingGuideParser, trackingParser);
     }
 
@@ -75,7 +73,7 @@ public class BringService {
      * @return TrackingResult Tracking data
      * @throws RequestFailedException
      */
-    public TrackingResult queryTracking(TrackingQuery trackingQuery) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult queryTracking(TrackingQuery trackingQuery) throws RequestFailedException {
         return trackingDao.query(trackingQuery);
     }
 
@@ -100,7 +98,7 @@ public class BringService {
      * @return TrackingResult Tracking data for authenticated users
      * @throws RequestFailedException
      */
-    public TrackingResult queryTracking(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult queryTracking(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
         return trackingDao.query(trackingQuery, apiUserId, apiKey);
     }
     
@@ -161,7 +159,7 @@ public class BringService {
         trackingDao = new TrackingDao(conn);
     }
 
-    private void initDaos(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<TrackingResult> trackingParser) {
+    private void initDaos(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<com.bring.api.tracking.response.v1.TrackingResult> trackingParser) {
         shippingGuideDao = new ShippingGuideDao(bringConnection, shippingGuideParser);
         trackingDao = new TrackingDao(bringConnection, trackingParser);
     }

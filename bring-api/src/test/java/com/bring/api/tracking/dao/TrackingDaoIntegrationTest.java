@@ -5,8 +5,7 @@ import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.tracking.request.TrackingQuery;
 import com.bring.api.tracking.request.Version;
 import com.bring.api.tracking.response.TrackingResponse;
-import com.bring.api.tracking.response.v1.TrackingResult;
-import com.bring.api.tracking.response.v2.TrackingResultV2;
+import com.bring.api.tracking.response.v2.TrackingResult;
 import no.bring.sporing._2.ConsigmentElementType;
 import no.bring.sporing._2.PackageCargoConsignmentType;
 import org.junit.Before;
@@ -18,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TrackingDaoIntegrationTest {
     TrackingDao dao;
-    TrackingResult cst;
+    com.bring.api.tracking.response.v1.TrackingResult cst;
         
     @Before
     public void setUp() throws RequestFailedException {
@@ -30,7 +29,7 @@ public class TrackingDaoIntegrationTest {
     
     @Test
     public void shouldFindConsignmentSetOnValidSearch() throws RequestFailedException {
-        assertEquals(TrackingResult.class, cst.getClass());
+        assertEquals(com.bring.api.tracking.response.v1.TrackingResult.class, cst.getClass());
     }
     
     @Test
@@ -60,7 +59,7 @@ public class TrackingDaoIntegrationTest {
         query.withOptionalVersion(Version.v2);
         TrackingResponse trackingResponse = dao.queryWithVersion(query);
 
-        List<ConsigmentElementType> consignments = ((TrackingResultV2) trackingResponse).getConsignmentSet().getConsignment();
+        List<ConsigmentElementType> consignments = ((TrackingResult) trackingResponse).getConsignmentSet().getConsignment();
         String consignmentId = ((PackageCargoConsignmentType) consignments.get(0)).getConsignmentId();
 
 
