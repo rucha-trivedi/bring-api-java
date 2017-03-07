@@ -10,6 +10,8 @@ import com.bring.api.tracking.request.Version;
 import com.bring.api.tracking.response.v1.Consignment;
 import com.bring.api.tracking.response.v1.Signature;
 import com.bring.api.tracking.response.v1.TrackingResult;
+import no.bring.sporing._2.ConsigmentElementType;
+import no.bring.sporing._2.ConsignmentSet;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +35,9 @@ public class TrackingDaoTest {
     private BringConnection bringConnectionMock2;
     private final HttpURLConnection connectionMock = mock(HttpURLConnection.class);
     private TrackingResult trackingResultMock;
+    private ConsignmentSet consignmentSetMock;
     BringParser<TrackingResult> bringParserMock;
+    BringParser<ConsignmentSet> bringParserMock2;
     TrackingDao dao;
 
     @Before
@@ -48,12 +52,16 @@ public class TrackingDaoTest {
         when(connectionMock.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
         
         trackingResultMock = mock(TrackingResult.class);
+        consignmentSetMock = mock(ConsignmentSet.class);
         when(trackingResultMock.getConsignments()).thenReturn(new ArrayList<Consignment>());
-        
+        when(consignmentSetMock.getConsignment()).thenReturn(new ArrayList<ConsigmentElementType>());
+
         bringParserMock = mock(BringParser.class);
+        bringParserMock2 = mock(BringParser.class);
         when(bringParserMock.unmarshal((InputStream) any())).thenReturn(trackingResultMock);
-        
-        dao = new TrackingDao(bringConnectionMock, bringParserMock);
+        when(bringParserMock2.unmarshal((InputStream) any())).thenReturn(consignmentSetMock);
+
+        dao = new TrackingDao(bringConnectionMock, bringParserMock, bringParserMock2);
     }
 
     @Test
@@ -132,10 +140,10 @@ public class TrackingDaoTest {
 
     @Test
     public void should_use_standard_url_for_versions() throws RequestFailedException, IOException {
-        dao = new TrackingDao(bringConnectionMock2, bringParserMock);
+        dao = new TrackingDao(bringConnectionMock2, bringParserMock, bringParserMock2);
         TrackingQuery trackingQuery = new TrackingQuery("123456");
         trackingQuery.withOptionalVersion(Version.v2);
-        dao.query(trackingQuery);
+        dao.queryWithVersion(trackingQuery);
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
         verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v2/tracking.xml?q=123456");

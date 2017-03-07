@@ -5,7 +5,6 @@ import com.bring.api.connection.BringConnection;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.request.Version;
 import com.bring.api.tracking.response.TrackingResponse;
 import com.bring.api.tracking.response.v1.Consignment;
 import com.bring.api.tracking.response.v1.Event;
@@ -20,6 +19,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.bring.api.tracking.request.Version.v1;
+import static com.bring.api.tracking.request.Version.v2;
+
 public class TrackingDao {
 
     final String OPEN_TRACKING_BASE_URL = "http://sporing.bring.no/api/{version}/tracking.xml";
@@ -30,8 +32,8 @@ public class TrackingDao {
     private BringParser<ConsignmentSet> bringParserV2;
 
     public TrackingDao(BringConnection connection){
-        bringParserV1 = new BringParser<TrackingResult>(TrackingResult.class);
-        bringParserV2 = new BringParser<ConsignmentSet>(ConsignmentSet.class);
+        bringParserV1 = v1.getParser();
+        bringParserV2 = v2.getParser();
         this.bringConnection = connection;
     }
 
@@ -40,9 +42,16 @@ public class TrackingDao {
         this.bringParserV1 = bringParserV1;
     }
 
+    public TrackingDao(BringConnection bringConnection, BringParser<TrackingResult> bringParserV1, BringParser<ConsignmentSet> bringParserV2) {
+        this.bringConnection = bringConnection;
+        this.bringParserV1 = bringParserV1;
+        this.bringParserV2 = bringParserV2;
+    }
+
+    @Deprecated
     public TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
-        if(trackingQuery.getVersion() != Version.v1) {
-            throw new RequestFailedException("Version not supported", 400);
+        if(trackingQuery.getVersion() != v1) {
+            throw new RequestFailedException("Version not supported : " + trackingQuery.getVersion(), 400);
         }
         return (TrackingResult) queryWithVersion(trackingQuery);
     }
