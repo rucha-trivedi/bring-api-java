@@ -7,6 +7,7 @@ import com.bring.api.tracking.request.Version;
 import com.bring.api.tracking.response.TrackingResponse;
 import com.bring.api.tracking.response.v2.TrackingResult;
 import no.bring.sporing._2.ConsigmentElementType;
+import no.bring.sporing._2.ConsignmentSet;
 import no.bring.sporing._2.PackageCargoConsignmentType;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,10 +60,12 @@ public class TrackingDaoIntegrationTest {
         query.withOptionalVersion(Version.v2);
         TrackingResponse trackingResponse = dao.queryWithVersion(query);
 
-        List<ConsigmentElementType> consignments = ((TrackingResult) trackingResponse).getConsignmentSet().getConsignment();
+        ConsignmentSet consignmentSet = ((TrackingResult) trackingResponse).getConsignmentSet();
+        List<ConsigmentElementType> consignments = consignmentSet.getConsignment();
         String consignmentId = ((PackageCargoConsignmentType) consignments.get(0)).getConsignmentId();
 
 
+        assertEquals("2", consignmentSet.getApiVersion());
         assertEquals("SHIPMENTNUMBER", consignmentId);
     }
 }

@@ -61,7 +61,7 @@ public class TrackingDaoTest {
         when(bringParserMock.unmarshal((InputStream) any())).thenReturn(trackingResultMock);
         when(bringParserMock2.unmarshal((InputStream) any())).thenReturn(consignmentSetMock);
 
-        dao = new TrackingDao(bringConnectionMock, bringParserMock, bringParserMock2);
+        dao = new TrackingDao(bringConnectionMock, bringParserMock);
     }
 
     @Test
@@ -136,17 +136,6 @@ public class TrackingDaoTest {
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
         verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v1/tracking.xml?q=123456");
-    }
-
-    @Test
-    public void should_use_standard_url_for_versions() throws RequestFailedException, IOException {
-        dao = new TrackingDao(bringConnectionMock2, bringParserMock, bringParserMock2);
-        TrackingQuery trackingQuery = new TrackingQuery("123456");
-        trackingQuery.withOptionalVersion(Version.v2);
-        dao.queryWithVersion(trackingQuery);
-
-        when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
-        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v2/tracking.xml?q=123456");
     }
 
     @Test

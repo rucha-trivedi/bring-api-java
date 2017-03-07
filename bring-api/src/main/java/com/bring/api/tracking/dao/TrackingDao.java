@@ -10,8 +10,6 @@ import com.bring.api.tracking.response.v1.Consignment;
 import com.bring.api.tracking.response.v1.Event;
 import com.bring.api.tracking.response.v1.Package;
 import com.bring.api.tracking.response.v1.Signature;
-import com.bring.api.tracking.response.v2.TrackingResult;
-import no.bring.sporing._2.ConsignmentSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.bring.api.tracking.request.Version.v1;
-import static com.bring.api.tracking.request.Version.v2;
 
 public class TrackingDao {
 
@@ -28,23 +25,14 @@ public class TrackingDao {
 
     private BringConnection bringConnection;
     private BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1;
-    private BringParser<ConsignmentSet> bringParserV2;
 
     public TrackingDao(BringConnection connection){
-        bringParserV1 = v1.getParser();
-        bringParserV2 = v2.getParser();
         this.bringConnection = connection;
     }
 
     public TrackingDao(BringConnection bringConnection, BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1) {
         this.bringConnection = bringConnection;
         this.bringParserV1 = bringParserV1;
-    }
-
-    public TrackingDao(BringConnection bringConnection, BringParser<com.bring.api.tracking.response.v1.TrackingResult> bringParserV1, BringParser<ConsignmentSet> bringParserV2) {
-        this.bringConnection = bringConnection;
-        this.bringParserV1 = bringParserV1;
-        this.bringParserV2 = bringParserV2;
     }
 
     @Deprecated
@@ -104,26 +92,21 @@ public class TrackingDao {
         }
     }
 
-    private TrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException {
-        switch (trackingQuery.getVersion()) {
-            case v1 :
-                return getV1Response(inputStream, baseUrl);
-            case v2 :
-                return getV2Response(inputStream);
-            default :
-                throw new RuntimeException("not supported tracking request version.");
+    private TrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException, RequestFailedException {
+        TrackingResponse trackingResponse;
+
+        if(trackingQuery.getVersion() == v1 && bringParserV1 != null) {
+            trackingResponse = bringParserV1.unmarshal(inputStream);
         }
-    }
+        else {
+            trackingResponse = trackingQuery.getVersion().unmarshal(inputStream);
+        }
 
-    private TrackingResponse getV1Response(InputStream inputStream, String baseUrl) throws UnmarshalException {
-        com.bring.api.tracking.response.v1.TrackingResult trackingResult = bringParserV1.unmarshal(inputStream);
-        convertSignatureUrlsToFullUrl(trackingResult, baseUrl);
-        return trackingResult;
-    }
+        if(trackingQuery.getVersion() == v1) {
+            convertSignatureUrlsToFullUrl((com.bring.api.tracking.response.v1.TrackingResult)trackingResponse, baseUrl);
+        }
 
-    private TrackingResponse getV2Response(InputStream inputStream) throws UnmarshalException {
-        ConsignmentSet consignmentSetType = bringParserV2.unmarshal(inputStream);
-        return new TrackingResult(consignmentSetType);
+        return trackingResponse;
     }
 
     private void convertSignatureUrlsToFullUrl(com.bring.api.tracking.response.v1.TrackingResult trackingResult, String baseUrl) {
@@ -148,11 +131,11 @@ public class TrackingDao {
     }
 
     private String getOpenTrackingBaseUrl(TrackingQuery trackingQuery) {
-        return OPEN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().name());
+        return OPEN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().getValue());
     }
 
     private String getLoggedInTrackingBaseUrl(TrackingQuery trackingQuery) {
-        return LOGGED_IN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().name());
+        return LOGGED_IN_TRACKING_BASE_URL.replace("{version}", trackingQuery.getVersion().getValue());
     }
 
     /**
