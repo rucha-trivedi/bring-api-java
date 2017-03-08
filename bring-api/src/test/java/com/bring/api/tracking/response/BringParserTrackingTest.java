@@ -2,6 +2,14 @@ package com.bring.api.tracking.response;
 
 import com.bring.api.BringParser;
 import com.bring.api.exceptions.UnmarshalException;
+import com.bring.api.tracking.response.v1.Consignment;
+import com.bring.api.tracking.response.v1.Event;
+import com.bring.api.tracking.response.v1.Length;
+import com.bring.api.tracking.response.v1.PackageSet;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import com.bring.api.tracking.response.v1.Package;
+import com.bring.api.tracking.response.v1.Volume;
+import com.bring.api.tracking.response.v1.Weight;
 import org.junit.Before;
 import org.junit.Test;
 

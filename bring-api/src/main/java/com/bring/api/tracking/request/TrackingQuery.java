@@ -2,11 +2,15 @@ package com.bring.api.tracking.request;
 
 import com.bring.api.exceptions.MissingParameterException;
 
+import static com.bring.api.tracking.request.Version.v1;
+
 public class TrackingQuery {
 
     private String queryNumber;
 
     private String optionalUrl;
+
+    private Version version = v1;
 
     public TrackingQuery() {
     }
@@ -14,8 +18,8 @@ public class TrackingQuery {
     public TrackingQuery(String queryNumber) {
         super();
         this.queryNumber = queryNumber;
+        this.version = v1;
     }
-
 
     /**
      * Required for making requests to the tracking system.
@@ -31,12 +35,21 @@ public class TrackingQuery {
         return this;
     }
 
+    public TrackingQuery withOptionalVersion(Version version){
+        this.version = version;
+        return this;
+    }
+
     public String getQueryNumber() {
         return queryNumber;
     }
 
     public String getOptionalUrl() {
         return optionalUrl;
+    }
+
+    public Version getVersion() {
+        return version;
     }
 
     public boolean hasOptionalUrl(){
@@ -47,6 +60,6 @@ public class TrackingQuery {
         if(queryNumber == null){
             throw new MissingParameterException("Missing query number.");
         }
-        return "?q="+queryNumber;
+        return "?q=" + queryNumber;
     }
 }

@@ -1,17 +1,15 @@
-package com.bring.api.tracking.response;
+package com.bring.api.tracking.response.v1;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-
-
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "LengthType", propOrder = {
+@XmlType(name = "WeightType", propOrder = {
     "value"
 })
-public class Length {
+public class Weight {
 
     @XmlValue
     protected String value;
@@ -28,7 +26,7 @@ public class Length {
 
     public String getUnitCode() {
         if (unitCode == null) {
-            return "cm";
+            return "kg";
         } else {
             return unitCode;
         }

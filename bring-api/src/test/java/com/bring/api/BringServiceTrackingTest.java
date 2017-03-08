@@ -22,7 +22,7 @@ import com.bring.api.connection.HttpUrlConnectionAdapter;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.shippingguide.response.ShippingGuideResult;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.response.v1.TrackingResult;
 
 public class BringServiceTrackingTest {
     private BringParser<TrackingResult> trackingParserMock;

@@ -6,9 +6,12 @@ import com.bring.api.connection.HttpUrlConnectionAdapter;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.Consignment;
-import com.bring.api.tracking.response.Signature;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.request.Version;
+import com.bring.api.tracking.response.v1.Consignment;
+import com.bring.api.tracking.response.v1.Signature;
+import com.bring.api.tracking.response.v1.TrackingResult;
+import no.bring.sporing._2.ConsigmentElementType;
+import no.bring.sporing._2.ConsignmentSet;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +35,9 @@ public class TrackingDaoTest {
     private BringConnection bringConnectionMock2;
     private final HttpURLConnection connectionMock = mock(HttpURLConnection.class);
     private TrackingResult trackingResultMock;
+    private ConsignmentSet consignmentSetMock;
     BringParser<TrackingResult> bringParserMock;
+    BringParser<ConsignmentSet> bringParserMock2;
     TrackingDao dao;
 
     @Before
@@ -47,11 +52,15 @@ public class TrackingDaoTest {
         when(connectionMock.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
         
         trackingResultMock = mock(TrackingResult.class);
+        consignmentSetMock = mock(ConsignmentSet.class);
         when(trackingResultMock.getConsignments()).thenReturn(new ArrayList<Consignment>());
-        
+        when(consignmentSetMock.getConsignment()).thenReturn(new ArrayList<ConsigmentElementType>());
+
         bringParserMock = mock(BringParser.class);
+        bringParserMock2 = mock(BringParser.class);
         when(bringParserMock.unmarshal((InputStream) any())).thenReturn(trackingResultMock);
-        
+        when(bringParserMock2.unmarshal((InputStream) any())).thenReturn(consignmentSetMock);
+
         dao = new TrackingDao(bringConnectionMock, bringParserMock);
     }
 
@@ -102,7 +111,7 @@ public class TrackingDaoTest {
         dao.query(new TrackingQuery("123456"), "username", "apiKey");
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
-        verify(bringConnectionMock2).openInputStream("https://www.mybring.com/tracking/api/tracking.xml?q=123456",
+        verify(bringConnectionMock2).openInputStream("https://www.mybring.com/tracking/api/v1/tracking.xml?q=123456",
                headers);
     }
 
@@ -126,7 +135,7 @@ public class TrackingDaoTest {
         dao.query(new TrackingQuery("123456"));
 
         when(bringConnectionMock2.openInputStream(anyString())).thenReturn(null);
-        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/tracking.xml?q=123456");
+        verify(bringConnectionMock2).openInputStream("http://sporing.bring.no/api/v1/tracking.xml?q=123456");
     }
 
     @Test

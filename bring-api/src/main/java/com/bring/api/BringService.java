@@ -10,8 +10,8 @@ import com.bring.api.shippingguide.request.Shipment;
 import com.bring.api.shippingguide.response.ShippingGuideResult;
 import com.bring.api.tracking.dao.TrackingDao;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.Signature;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
+import com.bring.api.tracking.response.v1.Signature;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -50,7 +50,7 @@ public class BringService {
      *
      * @param bringConnection Custom BringConnection
      */
-    public BringService(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<TrackingResult> trackingParser) {
+    public BringService(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<com.bring.api.tracking.response.v1.TrackingResult> trackingParser) {
         initDaos(bringConnection, shippingGuideParser, trackingParser);
     }
 
@@ -73,10 +73,21 @@ public class BringService {
      * @return TrackingResult Tracking data
      * @throws RequestFailedException
      */
-    public TrackingResult queryTracking(TrackingQuery trackingQuery) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult queryTracking(TrackingQuery trackingQuery) throws RequestFailedException {
         return trackingDao.query(trackingQuery);
     }
-    
+
+    /**
+     * Queries Bring Tracking for passed in query, with different versions of response.
+     *
+     * @param trackingQuery Search parameters (reference-, transmission-, or package number)
+     * @return AbstractTrackingResponse Tracking data for different versions
+     * @throws RequestFailedException
+     */
+    public AbstractTrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
+        return trackingDao.queryWithVersion(trackingQuery);
+    }
+
     /**
      * Queries Bring Tracking for passed in query using given API userID and key.
      * Returns more info than open (non-logged in) query.
@@ -87,7 +98,7 @@ public class BringService {
      * @return TrackingResult Tracking data for authenticated users
      * @throws RequestFailedException
      */
-    public TrackingResult queryTracking(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
+    public com.bring.api.tracking.response.v1.TrackingResult queryTracking(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
         return trackingDao.query(trackingQuery, apiUserId, apiKey);
     }
     
@@ -148,7 +159,7 @@ public class BringService {
         trackingDao = new TrackingDao(conn);
     }
 
-    private void initDaos(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<TrackingResult> trackingParser) {
+    private void initDaos(BringConnection bringConnection, BringParser<ShippingGuideResult> shippingGuideParser, BringParser<com.bring.api.tracking.response.v1.TrackingResult> trackingParser) {
         shippingGuideDao = new ShippingGuideDao(bringConnection, shippingGuideParser);
         trackingDao = new TrackingDao(bringConnection, trackingParser);
     }

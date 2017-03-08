@@ -1,4 +1,4 @@
-package com.bring.api.tracking.response;
+package com.bring.api.tracking.response.v1;
 
 import javax.xml.bind.annotation.*;
 

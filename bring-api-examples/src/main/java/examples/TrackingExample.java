@@ -3,7 +3,7 @@ package examples;
 import com.bring.api.BringService;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.TrackingResult;
+import com.bring.api.tracking.response.v1.TrackingResult;
 
 public class TrackingExample {
     public TrackingExample() throws RequestFailedException{
