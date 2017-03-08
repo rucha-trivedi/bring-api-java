@@ -4,7 +4,7 @@ import com.bring.api.connection.HttpUrlConnectionAdapter;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.tracking.request.TrackingQuery;
 import com.bring.api.tracking.request.Version;
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 import com.bring.api.tracking.response.v2.TrackingResult;
 import no.bring.sporing._2.ConsigmentElementType;
 import no.bring.sporing._2.ConsignmentSet;
@@ -58,7 +58,7 @@ public class TrackingDaoIntegrationTest {
         TrackingQuery query = new TrackingQuery();
         query.withQueryNumber("TESTPACKAGELOADEDFORDELIVERY");
         query.withOptionalVersion(Version.v2);
-        TrackingResponse trackingResponse = dao.queryWithVersion(query);
+        AbstractTrackingResponse trackingResponse = dao.queryWithVersion(query);
 
         ConsignmentSet consignmentSet = ((TrackingResult) trackingResponse).getConsignmentSet();
         List<ConsigmentElementType> consignments = consignmentSet.getConsignment();

@@ -5,7 +5,7 @@ import com.bring.api.connection.BringConnection;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 import com.bring.api.tracking.response.v1.Consignment;
 import com.bring.api.tracking.response.v1.Event;
 import com.bring.api.tracking.response.v1.Package;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.bring.api.tracking.request.Version.v1;
 import static java.util.Objects.nonNull;
@@ -43,7 +42,7 @@ public class TrackingDao {
         return (com.bring.api.tracking.response.v1.TrackingResult) queryWithVersion(trackingQuery);
     }
 
-    public TrackingResponse queryWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
+    public AbstractTrackingResponse queryWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
         String baseUrl = getOpenTrackingBaseUrl(trackingQuery);
         if(trackingQuery.hasOptionalUrl()){
             baseUrl = trackingQuery.getOptionalUrl();
@@ -66,7 +65,7 @@ public class TrackingDao {
         return (com.bring.api.tracking.response.v1.TrackingResult) query(baseUrl, trackingQuery, headers);
     }
     
-    private TrackingResponse query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
+    private AbstractTrackingResponse query(String baseUrl, TrackingQuery trackingQuery, Map<String, String> headers) throws RequestFailedException {
         String url = baseUrl + trackingQuery.toQueryString();
         InputStream inputStream = null;
         try {
@@ -76,8 +75,8 @@ public class TrackingDao {
             else {
                 inputStream = bringConnection.openInputStream(url, headers);
             }
-            TrackingResponse trackingResult = getTrackingResponse(trackingQuery, inputStream, baseUrl);
-            return trackingResult;
+            AbstractTrackingResponse trackingResponse = getTrackingResponse(trackingQuery, inputStream, baseUrl);
+            return trackingResponse;
         }
         catch (UnmarshalException e) {
             throw new RequestFailedException(e);
@@ -94,8 +93,8 @@ public class TrackingDao {
         }
     }
 
-    private TrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException, RequestFailedException {
-        TrackingResponse trackingResponse;
+    private AbstractTrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException, RequestFailedException {
+        AbstractTrackingResponse trackingResponse;
 
         if(trackingQuery.getVersion().is(v1) && nonNull(bringParserV1)) {
             trackingResponse = bringParserV1.unmarshal(inputStream);

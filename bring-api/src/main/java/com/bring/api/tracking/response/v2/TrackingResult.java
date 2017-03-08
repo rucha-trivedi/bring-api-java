@@ -1,9 +1,9 @@
 package com.bring.api.tracking.response.v2;
 
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 import no.bring.sporing._2.ConsignmentSet;
 
-public class TrackingResult implements TrackingResponse {
+public class TrackingResult extends AbstractTrackingResponse {
     private ConsignmentSet consignmentSet;
 
     public TrackingResult(ConsignmentSet consignmentSet) {

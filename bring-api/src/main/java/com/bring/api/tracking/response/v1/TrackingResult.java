@@ -1,6 +1,6 @@
 package com.bring.api.tracking.response.v1;
 
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "ConsignmentSet")
-public class TrackingResult implements TrackingResponse {
+public class TrackingResult extends AbstractTrackingResponse {
 
     @XmlElement(name = "Status")
     protected List<TraceStatus> status;

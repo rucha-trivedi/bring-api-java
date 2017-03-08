@@ -10,7 +10,7 @@ import com.bring.api.shippingguide.request.Shipment;
 import com.bring.api.shippingguide.response.ShippingGuideResult;
 import com.bring.api.tracking.dao.TrackingDao;
 import com.bring.api.tracking.request.TrackingQuery;
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 import com.bring.api.tracking.response.v1.Signature;
 
 import java.io.InputStream;
@@ -81,10 +81,10 @@ public class BringService {
      * Queries Bring Tracking for passed in query, with different versions of response.
      *
      * @param trackingQuery Search parameters (reference-, transmission-, or package number)
-     * @return TrackingResponse Tracking data
+     * @return AbstractTrackingResponse Tracking data for different versions
      * @throws RequestFailedException
      */
-    public TrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
+    public AbstractTrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
         return trackingDao.queryWithVersion(trackingQuery);
     }
 

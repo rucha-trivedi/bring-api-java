@@ -3,7 +3,7 @@ package com.bring.api.tracking.request;
 import com.bring.api.BringParser;
 import com.bring.api.exceptions.RequestFailedException;
 import com.bring.api.exceptions.UnmarshalException;
-import com.bring.api.tracking.response.TrackingResponse;
+import com.bring.api.tracking.response.AbstractTrackingResponse;
 import com.bring.api.tracking.response.v1.TrackingResult;
 import no.bring.sporing._2.ConsignmentSet;
 
@@ -14,7 +14,7 @@ public enum Version {
     v2("v2", new BringParser<ConsignmentSet>(ConsignmentSet.class));
 
     private String value;
-    private BringParser<TrackingResponse> parser;
+    private BringParser parser;
 
     Version(String version, BringParser parser) {
         this.value = version;
@@ -25,9 +25,9 @@ public enum Version {
         return value;
     }
 
-    public TrackingResponse unmarshal(InputStream inputStream) throws UnmarshalException, RequestFailedException {
+    public AbstractTrackingResponse unmarshal(InputStream inputStream) throws UnmarshalException, RequestFailedException {
         if(is(v1)) {
-            return this.parser.unmarshal(inputStream);
+            return (TrackingResult) this.parser.unmarshal(inputStream);
         }
         if (is(v2)) {
             return new com.bring.api.tracking.response.v2.TrackingResult((ConsignmentSet) this.parser.unmarshal(inputStream));
