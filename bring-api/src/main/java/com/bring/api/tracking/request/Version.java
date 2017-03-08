@@ -26,12 +26,16 @@ public enum Version {
     }
 
     public TrackingResponse unmarshal(InputStream inputStream) throws UnmarshalException, RequestFailedException {
-        if(this == v1) {
+        if(is(v1)) {
             return this.parser.unmarshal(inputStream);
         }
-        if (this == v2) {
+        if (is(v2)) {
             return new com.bring.api.tracking.response.v2.TrackingResult((ConsignmentSet) this.parser.unmarshal(inputStream));
         }
         throw new RequestFailedException("not supported value : " + this.name(), 400);
+    }
+
+    public boolean is(Version version) {
+        return this == version;
     }
 }

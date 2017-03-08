@@ -15,8 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.bring.api.tracking.request.Version.v1;
+import static java.util.Objects.nonNull;
 
 public class TrackingDao {
 
@@ -37,9 +39,7 @@ public class TrackingDao {
 
     @Deprecated
     public com.bring.api.tracking.response.v1.TrackingResult query(TrackingQuery trackingQuery) throws RequestFailedException {
-        if(trackingQuery.getVersion() != v1) {
-            throw new RequestFailedException("Version not supported : " + trackingQuery.getVersion(), 400);
-        }
+        validateRequestIsForVersion1(trackingQuery);
         return (com.bring.api.tracking.response.v1.TrackingResult) queryWithVersion(trackingQuery);
     }
 
@@ -53,6 +53,8 @@ public class TrackingDao {
     }
 
     public com.bring.api.tracking.response.v1.TrackingResult query(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
+        validateRequestIsForVersion1(trackingQuery);
+
         Map<String,String> headers = new HashMap<String,String>();
         headers.put("X-MyBring-API-Uid", apiUserId);
         headers.put("X-MyBring-API-Key", apiKey);
@@ -95,14 +97,14 @@ public class TrackingDao {
     private TrackingResponse getTrackingResponse(TrackingQuery trackingQuery, InputStream inputStream, String baseUrl) throws UnmarshalException, RequestFailedException {
         TrackingResponse trackingResponse;
 
-        if(trackingQuery.getVersion() == v1 && bringParserV1 != null) {
+        if(trackingQuery.getVersion().is(v1) && nonNull(bringParserV1)) {
             trackingResponse = bringParserV1.unmarshal(inputStream);
         }
         else {
             trackingResponse = trackingQuery.getVersion().unmarshal(inputStream);
         }
 
-        if(trackingQuery.getVersion() == v1) {
+        if(trackingQuery.getVersion().is(v1)) {
             convertSignatureUrlsToFullUrl((com.bring.api.tracking.response.v1.TrackingResult)trackingResponse, baseUrl);
         }
 
@@ -127,6 +129,12 @@ public class TrackingDao {
         String url = event.getSignature().getLinkToImage();
         if (url != null && !url.matches("^https?://.*")) {
             event.getSignature().setLinkToImage(urlPrefix + url);
+        }
+    }
+
+    private void validateRequestIsForVersion1(TrackingQuery trackingQuery) throws RequestFailedException {
+        if(!trackingQuery.getVersion().is(v1)) {
+            throw new RequestFailedException("Version not supported : " + trackingQuery.getVersion(), 400);
         }
     }
 
