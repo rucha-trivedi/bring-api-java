@@ -32,7 +32,7 @@ public enum Version {
         if (is(v2)) {
             return new com.bring.api.tracking.response.v2.TrackingResult((ConsignmentSet) this.parser.unmarshal(inputStream));
         }
-        throw new RequestFailedException("not supported value : " + this.name(), 400);
+        throw new RequestFailedException("not supported version : " + this.name(), 400);
     }
 
     public boolean is(Version version) {
