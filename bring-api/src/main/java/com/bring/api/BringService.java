@@ -78,7 +78,8 @@ public class BringService {
     }
 
     /**
-     * Queries Bring Tracking for passed in query, with different versions of response.
+     * Queries Bring Tracking for passed in query, with different versions of response
+     * and provides open tracking response.
      *
      * @param trackingQuery Search parameters (reference-, transmission-, or package number)
      * @return AbstractTrackingResponse Tracking data for different versions
@@ -86,6 +87,18 @@ public class BringService {
      */
     public AbstractTrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery) throws RequestFailedException {
         return trackingDao.queryWithVersion(trackingQuery);
+    }
+
+    /**
+     * Queries Bring Tracking for passed in query, with different versions of response
+     * and provides the logged in response.
+     *
+     * @param trackingQuery Search parameters (reference-, transmission-, or package number)
+     * @return AbstractTrackingResponse Tracking data for different versions
+     * @throws RequestFailedException
+     */
+    public AbstractTrackingResponse queryTrackingWithVersion(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
+        return trackingDao.queryWithVersion(trackingQuery, apiUserId, apiKey);
     }
 
     /**

@@ -51,6 +51,19 @@ public class TrackingDao {
         return query(baseUrl, trackingQuery, null);
     }
 
+    public AbstractTrackingResponse queryWithVersion(TrackingQuery trackingQuery , String apiUserId, String apiKey) throws RequestFailedException {
+        Map<String,String> headers = new HashMap<String,String>();
+        headers.put("X-MyBring-API-Uid", apiUserId);
+        headers.put("X-MyBring-API-Key", apiKey);
+
+        String baseUrl = getLoggedInTrackingBaseUrl(trackingQuery);
+        if(trackingQuery.hasOptionalUrl()){
+            baseUrl = trackingQuery.getOptionalUrl();
+        }
+
+        return query(baseUrl, trackingQuery, headers);
+    }
+
     public com.bring.api.tracking.response.v1.TrackingResult query(TrackingQuery trackingQuery, String apiUserId, String apiKey) throws RequestFailedException {
         validateRequestIsForVersion1(trackingQuery);
 

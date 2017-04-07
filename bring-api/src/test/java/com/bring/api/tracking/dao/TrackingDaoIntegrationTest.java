@@ -68,4 +68,13 @@ public class TrackingDaoIntegrationTest {
         assertEquals("2", consignmentSet.getApiVersion());
         assertEquals("SHIPMENTNUMBER", consignmentId);
     }
+
+    @Test(expected = RequestFailedException.class)
+    public void should_handle_invalid_login_for_tracking_version2() throws Exception {
+        dao = new TrackingDao(new HttpUrlConnectionAdapter("test"));
+        TrackingQuery query = new TrackingQuery();
+        query.withQueryNumber("TESTPACKAGELOADEDFORDELIVERY");
+        query.withOptionalVersion(Version.v2);
+        dao.queryWithVersion(query , "username" , "apiKey");
+    }
 }
