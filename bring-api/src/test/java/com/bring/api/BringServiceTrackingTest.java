@@ -28,6 +28,7 @@ public class BringServiceTrackingTest {
     private BringParser<TrackingResult> trackingParserMock;
     private BringParser<ShippingGuideResult> shippingGuideParserMock;
     private BringConnection bringConnectionMock;
+    private BringService bringService;
 
     @Before
     public void setUp() throws IOException, RequestFailedException {
@@ -40,11 +41,12 @@ public class BringServiceTrackingTest {
         trackingParserMock = mock(BringParser.class);
         when(trackingParserMock.unmarshal(emptyInputStream)).thenReturn(new TrackingResult());
         when(shippingGuideParserMock.unmarshal(emptyInputStream)).thenReturn(new ShippingGuideResult());
+
+        bringService = new BringService(bringConnectionMock, shippingGuideParserMock, trackingParserMock);
     }
     
     @Test
     public void shouldNotSetLoginHeadersOnNormalQuery() throws RequestFailedException {
-        BringService bringService = new BringService(bringConnectionMock, shippingGuideParserMock, trackingParserMock);
         bringService.queryTracking(new TrackingQuery("12345"));
 
         verify(bringConnectionMock).openInputStream(anyString());
@@ -54,9 +56,20 @@ public class BringServiceTrackingTest {
     @Test
     public void shouldBeAbleToSetCustomHeaders() throws RequestFailedException {
         ArgumentCaptor<Map> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-
-        BringService bringService = new BringService(bringConnectionMock, shippingGuideParserMock, trackingParserMock);
         bringService.queryTracking(new TrackingQuery("12345"), "username", "apiKey");
+
+        verify(bringConnectionMock, never()).openInputStream(anyString());
+        verify(bringConnectionMock).openInputStream(anyString(), mapArgumentCaptor.capture());
+
+        assertEquals(2, mapArgumentCaptor.getValue().keySet().size());
+        assertEquals("username", mapArgumentCaptor.getValue().get("X-MyBring-API-Uid"));
+        assertEquals("apiKey", mapArgumentCaptor.getValue().get("X-MyBring-API-Key"));
+    }
+
+    @Test
+    public void shouldBeAbleToSetCustomHeadersWhileQueryingWithVersions() throws RequestFailedException {
+        ArgumentCaptor<Map> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        bringService.queryTrackingWithVersion(new TrackingQuery("12345"), "username", "apiKey");
 
         verify(bringConnectionMock, never()).openInputStream(anyString());
         verify(bringConnectionMock).openInputStream(anyString(), mapArgumentCaptor.capture());
